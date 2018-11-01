@@ -1,7 +1,7 @@
 import json
 
 import requests
-from requests_oauthlib import OAuth1Session, OAuth1
+from requests_oauthlib import OAuth1
 
 from exceptions import TelldusRequestException
 import mixins
@@ -35,9 +35,7 @@ class TelldusSession():
         response = self.__session.get(full_url, params=params)
         if response.status_code == requests.codes.ok:
             return response.json()
-        else:
-            print(response.text)
-            raise TelldusRequestException(response)
+        raise TelldusRequestException(response)
 
     @staticmethod
     def pprint(json_data):
