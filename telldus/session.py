@@ -4,7 +4,7 @@ import requests
 from requests_oauthlib import OAuth1
 
 from exceptions import TelldusRequestException
-import mixins
+from mixins import INSTALLED_MIXINS
 
 class TelldusSession():
     device_ids = None
@@ -23,8 +23,8 @@ class TelldusSession():
         self.__session = requests.Session()
         self.__session.auth = oauth
 
-        self.device = mixins.DeviceMixin(self)
-        self.sensor = mixins.SensorMixin(self)
+        for name, mixin in INSTALLED_MIXINS.items():
+            setattr(self, name, mixin(self))
 
     def communicate(self, url, params=None):
         full_url = 'https://api.telldus.com/json/%s' % url

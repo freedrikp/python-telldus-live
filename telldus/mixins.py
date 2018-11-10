@@ -17,9 +17,11 @@ class BaseMixin(abc.ABC):
 
         return self._name_id_map[name]
 
-    def _action(self, action, unit):
+    def _action(self, action, unit, params={}):
         unit_id = unit if unit.isdigit() else self.get_unit_id(unit)
-        return self._session.communicate('%s/%s' % (self._mixin, action), params={'id': unit_id})
+        _params = {'id': unit_id}
+        _params.update(params)
+        return self._session.communicate('%s/%s' % (self._mixin, action), params=_params)
 
 class DeviceMixin(BaseMixin):
     _mixin = 'device'
@@ -33,5 +35,13 @@ class DeviceMixin(BaseMixin):
 class SensorMixin(BaseMixin):
     _mixin = 'sensor'
 
-    def sensor_info(self, sensor):
-        return self._action('info', sensor)
+    def sensor_info(self, sensor, include_unit=False):
+        params = {}
+        if include_unit:
+            params = {'includeUnit':'1'}
+        return self._action('info', sensor, params)
+
+INSTALLED_MIXINS = {
+    'device': DeviceMixin,
+    'sensor': SensorMixin
+}
