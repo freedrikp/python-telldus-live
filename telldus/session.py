@@ -3,8 +3,8 @@ import json
 import requests
 from requests_oauthlib import OAuth1
 
-from exceptions import TelldusRequestException
-from mixins import INSTALLED_MIXINS
+from .exceptions import TelldusRequestException
+from .mixins import INSTALLED_MIXINS
 
 class TelldusSession():
     device_ids = None

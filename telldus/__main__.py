@@ -1,6 +1,3 @@
-import cli
+from .cli import run_cli
 
-cli.run_cli()
-
-
-# TODO Argparse sub-parsers for each mixin
+run_cli()

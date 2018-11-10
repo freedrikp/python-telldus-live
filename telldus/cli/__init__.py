@@ -1,13 +1,14 @@
 import argparse
 
-from configuration import JSONTelldusConfiguraton
-from session import TelldusSession
-from cli.mixins import INSTALLED_MIXINS
+from ..configuration import JSONTelldusConfiguraton
+from ..session import TelldusSession
+from .mixins import INSTALLED_MIXINS
 
 def parse_args():
     parser = argparse.ArgumentParser("Telldus REST API CLI")
     parser.add_argument('-f', '--file', type=str, default="telldus.json", help="Configuration file.")
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(dest='command')
+    subparsers.required = True
     for mixin in INSTALLED_MIXINS:
         mixin(subparsers)
     return parser.parse_args()
