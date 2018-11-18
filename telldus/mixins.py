@@ -14,7 +14,10 @@ class BaseMixin(abc.ABC):
             self._name_id_map_data = {}
             units = self._session.communicate('%ss/list' % self._mixin)
             for unit in units[self._mixin]:
-                self._name_id_map_data[unit['name']] = unit['id']
+                if unit['name']:
+                    self._name_id_map_data[unit['name']] = unit['id']
+                else:
+                    self._name_id_map_data[unit['id']] = unit['id']
         return self._name_id_map_data
 
     @property
