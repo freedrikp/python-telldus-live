@@ -3,7 +3,7 @@ import json
 import requests
 from requests_oauthlib import OAuth1
 
-from .exceptions import TelldusRequestException
+from .exceptions import *
 from .mixins import INSTALLED_MIXINS
 
 class TelldusSession():
@@ -33,8 +33,12 @@ class TelldusSession():
         # if 'local' in kwargs:
         #     del kwargs['local']
         response = self.__session.get(full_url, params=params)
-        if response.status_code == requests.codes.ok:
+        if response.ok:
             return response.json()
+        if response.status_code >= 500:
+            raise TelldusRequestServerError(response)
+        if response.status_code >= 400:
+            raise TelldusRequestClientError(response)
         raise TelldusRequestException(response)
 
     @staticmethod
