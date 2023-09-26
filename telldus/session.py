@@ -34,7 +34,10 @@ class TelldusSession():
         #     del kwargs['local']
         response = self.__session.get(full_url, params=params)
         if response.ok:
-            return response.json()
+            try:
+                return response.json()
+            except:
+                raise TelldusRequestPayloadError(response)
         if response.status_code >= 500:
             raise TelldusRequestServerError(response)
         if response.status_code >= 400:
