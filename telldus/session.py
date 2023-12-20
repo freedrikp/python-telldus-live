@@ -27,7 +27,7 @@ class TelldusSession():
             setattr(self, name, mixin(self))
 
     def communicate(self, url, params=None):
-        full_url = 'https://api.telldus.com/json/%s' % url
+        full_url = 'https://pa-api.telldus.com/json/%s' % url
         # if kwargs.get('local'):
         #     full_url = 'http://192.168.1.98/api/%s' % url
         # if 'local' in kwargs:
