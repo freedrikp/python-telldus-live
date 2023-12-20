@@ -51,9 +51,10 @@ class SensorCliMixin(BaseCliMixin):
             print("Max: %s%s at %s" % (entry["max"], entry.get("unit", ""), datetime.fromtimestamp(entry["maxTime"])))
             print("Min: %s%s at %s" % (entry["min"], entry.get("unit", ""), datetime.fromtimestamp(entry["minTime"])))
 
-    def __print_sensor_info(self, info):
+    def _print_sensor_info(self, info):
         print("-"*50)
         print("Client: %s" % info["clientName"])
+        print("Name: %s" % info["name"])
         self.__print_battery_status(int(info["battery"]))
         for entry in info["data"]:
             self.__print_data_entry(entry)
@@ -62,10 +63,20 @@ class SensorCliMixin(BaseCliMixin):
     def run(self, session, args):
         if args.info:
             for sensor in args.info:
-                self.__print_sensor_info(session.sensor.sensor_info(sensor, include_unit=True))
+                self._print_sensor_info(session.sensor.sensor_info(sensor, include_unit=True))
 
+class SensorsCliMixin(SensorCliMixin):
+    _command = 'sensors'
+
+    def _add_arguments(self, parser):
+        return
+
+    def run(self, session, _args):
+        for sensor in session.sensors.sensors_list(include_values=True, include_scale=True, include_unit=True)['sensor']:
+            self._print_sensor_info(sensor)
 
 INSTALLED_MIXINS = [
     DeviceCliMixin,
-    SensorCliMixin
+    SensorCliMixin,
+    SensorsCliMixin
 ]

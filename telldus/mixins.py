@@ -28,9 +28,11 @@ class BaseMixin(abc.ABC):
     def get_unit_id(self, name):
         return self._name_id_map[name]
 
-    def _action(self, action, unit, params={}):
-        unit_id = unit if unit.isdigit() else self.get_unit_id(unit)
-        _params = {'id': unit_id}
+    def _action(self, action, unit=None, params={}):
+        _params = {}
+        if unit is not None:
+            unit_id = unit if unit.isdigit() else self.get_unit_id(unit)
+            _params = {'id': unit_id}
         _params.update(params)
         return self._session.communicate('%s/%s' % (self._mixin, action), params=_params)
 
@@ -52,7 +54,23 @@ class SensorMixin(BaseMixin):
             params = {'includeUnit':'1'}
         return self._action('info', sensor, params)
 
+class SensorsMixin(BaseMixin):
+    _mixin = 'sensors'
+
+    def sensors_list(self, include_ignored=False, include_values=False, include_scale=False, include_unit=False):
+        params = {}
+        if include_ignored:
+            params['includeIgnored'] = 1
+        if include_values:
+            params['includeValues'] = 1
+        if include_scale:
+            params['includeScale'] = 1
+        if include_unit:
+            params['inlcudeUnit'] = 1
+        return self._action('list', params=params)
+
 INSTALLED_MIXINS = {
     'device': DeviceMixin,
-    'sensor': SensorMixin
+    'sensor': SensorMixin,
+    'sensors': SensorsMixin
 }
