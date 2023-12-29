@@ -1,12 +1,15 @@
 
 
 class TelldusRequestException(Exception):
-    # TODO: Extend this to print relevant response data in message
+
+    def __init__(self, response):
+        self.__response = response
+        message = '%s\n%s\n%s' % (response.status_code, response.headers, response.text)
+        super().__init__(message)
 
     @property
     def status_code(self):
-        response, = self.args
-        return response.status_code
+        return self.__response.status_code
 
 class TelldusRequestClientError(TelldusRequestException):
     pass
