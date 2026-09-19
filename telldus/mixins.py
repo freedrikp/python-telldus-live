@@ -45,6 +45,14 @@ class DeviceMixin(BaseMixin):
     def turn_off_device(self, device):
         return self._action('turnOff', device)
 
+    def device_info(self, device, supported_methods=None, extras=None):
+        params = {}
+        if supported_methods:
+            params['supportedMethods'] = supported_methods
+        if extras:
+            params['extras'] = extras
+        return self._action('info', device, params)
+
 class SensorMixin(BaseMixin):
     _mixin = 'sensor'
 

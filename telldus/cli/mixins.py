@@ -15,10 +15,25 @@ class BaseCliMixin(abc.ABC):
 
 class DeviceCliMixin(BaseCliMixin):
     _command = 'device'
+    __state = {
+        1: "On",
+        2: "Off",
+    }
 
     def _add_arguments(self, parser):
         parser.add_argument('--on', type=str, nargs='+', help="Devices to turn on.")
         parser.add_argument('--off', type=str, nargs='+', help="Devices to turn off.")
+        parser.add_argument('--info', type=str, nargs='+', help="Device to collect info from.")
+
+    def _print_device_info(self, info):
+        print("-"*50)
+        if "clientName"in info:
+            print("Client: %s" % info["clientName"])
+        print("Name: %s" % info["name"])
+        if "model" in info:
+            print("Model: %s" % info["model"])
+        print("State: %s" % self.__state[info["state"]])
+        print("-"*50)
 
     def run(self, session, args):
         if args.on:
@@ -28,6 +43,10 @@ class DeviceCliMixin(BaseCliMixin):
         if args.off:
             for device in args.off:
                 session.pprint(session.device.turn_off_device(device))
+
+        if args.info:
+            for device in args.info:
+                self._print_device_info(session.device.device_info(device, supported_methods=2**13 - 1))
 
 class SensorCliMixin(BaseCliMixin):
     _command = 'sensor'
