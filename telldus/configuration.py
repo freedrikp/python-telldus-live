@@ -27,6 +27,10 @@ class BaseTelldusConfiguration(abc.ABC):
     def get_local_address(self):
         return None
 
+    @abc.abstractmethod
+    def get_local_client_name(self):
+        return None
+
 class JSONTelldusConfiguraton(BaseTelldusConfiguration):
 
     def __init__(self, json_file):
@@ -50,5 +54,8 @@ class JSONTelldusConfiguraton(BaseTelldusConfiguration):
 
     def get_local_address(self):
         return self.json_data['local_address']
+
+    def get_local_client_name(self):
+        return self.json_data['local_client_name']
 
 # TODO create a Oauth 1.0 workflow Configuration class

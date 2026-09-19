@@ -64,3 +64,13 @@ class TelldusLocalSession(TelldusSession):
         token_auth = TokenAuth(config.get_access_token())
         address = "%s/api" % config.get_local_address()
         super().__init__(address, token_auth)
+        self.__client_name = config.get_local_client_name()
+
+    def communicate(self, url, params=None):
+        response = super().communicate(url, params=params)
+        if url.rpartition("/")[2] == "list":
+            for value in response.values():
+                for item in value:
+                    if "clientName" not in item:
+                        item["clientName"] = self.__client_name
+        return response
