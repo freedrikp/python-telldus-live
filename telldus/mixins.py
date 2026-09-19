@@ -53,6 +53,17 @@ class DeviceMixin(BaseMixin):
             params['extras'] = extras
         return self._action('info', device, params)
 
+class DevicesMixin(BaseMixin):
+    _mixin = 'devices'
+
+    def devices_list(self, supported_methods=None, extras=None):
+        params = {}
+        if supported_methods:
+            params['supportedMethods'] = supported_methods
+        if extras:
+            params['extras']= extras
+        return self._action('list', params=params)
+
 class SensorMixin(BaseMixin):
     _mixin = 'sensor'
 
@@ -79,6 +90,7 @@ class SensorsMixin(BaseMixin):
 
 INSTALLED_MIXINS = {
     'device': DeviceMixin,
+    'devices': DevicesMixin,
     'sensor': SensorMixin,
     'sensors': SensorsMixin
 }

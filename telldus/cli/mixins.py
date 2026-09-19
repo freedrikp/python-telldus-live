@@ -48,6 +48,16 @@ class DeviceCliMixin(BaseCliMixin):
             for device in args.info:
                 self._print_device_info(session.device.device_info(device, supported_methods=2**13 - 1))
 
+class DevicesCliMixin(DeviceCliMixin):
+    _command = 'devices'
+
+    def _add_arguments(self, parser):
+        return
+
+    def run(self, session, _args):
+        for device in session.devices.devices_list(supported_methods=2**13 - 1)["device"]:
+            self._print_device_info(device)
+
 class SensorCliMixin(BaseCliMixin):
     _command = 'sensor'
     __battery_indicator = {
@@ -97,6 +107,7 @@ class SensorsCliMixin(SensorCliMixin):
 
 INSTALLED_MIXINS = [
     DeviceCliMixin,
+    DevicesCliMixin,
     SensorCliMixin,
     SensorsCliMixin
 ]
