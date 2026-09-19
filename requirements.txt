@@ -1,7 +1,8 @@
-certifi==2018.10.15
-chardet==3.0.4
-idna==2.7
-oauthlib==2.1.0
-requests==2.20.0
-requests-oauthlib==1.0.0
-urllib3==1.24
+certifi==2026.7.22
+charset-normalizer==3.5.1
+idna==3.20
+oauthlib==3.3.1
+PyJWT==2.14.0
+requests==2.34.2
+requests-oauthlib==2.0.0
+urllib3==2.8.0

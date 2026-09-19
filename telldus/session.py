@@ -1,8 +1,10 @@
 import json
+import datetime
 
 import requests
 from requests_oauthlib import OAuth1
 from requests.auth import AuthBase
+import jwt
 
 from .exceptions import *
 from .mixins import INSTALLED_MIXINS
@@ -60,17 +62,35 @@ class TelldusLiveSession(TelldusSession):
 
 class TelldusLocalSession(TelldusSession):
 
-    def __init__(self, config):
+    def __init__(self, config, token_refresh_limit=datetime.timedelta(days=1)):
         token_auth = TokenAuth(config.get_access_token())
         address = "%s/api" % config.get_local_address()
         super().__init__(address, token_auth)
-        self.__client_name = config.get_local_client_name()
+        self.__config = config
+        self.__token_refresh_limit = token_refresh_limit
+
+    def refresh_token(self, config):
+        decoded_token = jwt.decode_complete(config.get_access_token(), options={"verify_signature": False})
+        if not decoded_token["payload"]["renew"]:
+            raise RuntimeError("Token is not allowed to renew itself")
+
+        expiry = datetime.datetime.utcfromtimestamp(decoded_token["header"]["exp"])
+        time_left = expiry - datetime.datetime.utcnow()
+
+        if time_left.total_seconds() < 0:
+            raise RuntimeError("Token has expired")
+
+        if time_left <= self.__token_refresh_limit:
+            new_token = super().communicate("refreshToken")["token"]
+            self._session.auth = TokenAuth(new_token)
+            self.__config.update_local_access_token(new_token)
 
     def communicate(self, url, params=None):
+        self.refresh_token(self.__config)
         response = super().communicate(url, params=params)
         if url.rpartition("/")[2] == "list":
             for value in response.values():
                 for item in value:
                     if "clientName" not in item:
-                        item["clientName"] = self.__client_name
+                        item["clientName"] = self.__config.get_local_client_name()
         return response

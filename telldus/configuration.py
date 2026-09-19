@@ -24,6 +24,10 @@ class BaseTelldusConfiguration(abc.ABC):
         return None
 
     @abc.abstractmethod
+    def update_local_access_token(self, token):
+        pass
+
+    @abc.abstractmethod
     def get_local_address(self):
         return None
 
@@ -34,8 +38,13 @@ class BaseTelldusConfiguration(abc.ABC):
 class JSONTelldusConfiguraton(BaseTelldusConfiguration):
 
     def __init__(self, json_file):
+        self.__json_file = json_file
         with open(json_file) as file_obj:
             self.json_data = json.load(file_obj)
+
+    def __write_json_file(self):
+        with open(self.__json_file, "w") as file_obj:
+           json.dump(self.json_data, file_obj, indent=2)
 
     def get_public_key(self):
         return self.json_data['public_key']
@@ -51,6 +60,10 @@ class JSONTelldusConfiguraton(BaseTelldusConfiguration):
 
     def get_access_token(self):
         return self.json_data['access_token']
+
+    def update_local_access_token(self, token):
+        self.json_data["access_token"] = token
+        self.__write_json_file()
 
     def get_local_address(self):
         return self.json_data['local_address']
