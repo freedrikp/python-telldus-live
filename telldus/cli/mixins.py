@@ -53,7 +53,8 @@ class SensorCliMixin(BaseCliMixin):
 
     def _print_sensor_info(self, info):
         print("-"*50)
-        print("Client: %s" % info["clientName"])
+        if "clientName"in info:
+            print("Client: %s" % info["clientName"])
         print("Name: %s" % info["name"])
         self.__print_battery_status(int(info["battery"]))
         for entry in info["data"]:

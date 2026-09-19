@@ -2,37 +2,36 @@ import json
 
 import requests
 from requests_oauthlib import OAuth1
+from requests.auth import AuthBase
 
 from .exceptions import *
 from .mixins import INSTALLED_MIXINS
+
+
+class TokenAuth(AuthBase):
+    def __init__(self, token):
+        self.token = token
+
+    def __call__(self, request):
+        request.headers['Authorization'] = "Bearer %s" % self.token
+        return request
 
 class TelldusSession():
     device_ids = None
     sensor_ids = None
 
-    def __init__(self, config, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, address, auth):
 
-        oauth = OAuth1(
-            config.get_public_key(),
-            client_secret=config.get_private_key(),
-            resource_owner_key=config.get_token(),
-            resource_owner_secret=config.get_token_secret()
-        )
-
-        self.__session = requests.Session()
-        self.__session.auth = oauth
+        self._session = requests.Session()
+        self._session.auth = auth
+        self.__address = address
 
         for name, mixin in INSTALLED_MIXINS.items():
             setattr(self, name, mixin(self))
 
     def communicate(self, url, params=None):
-        full_url = 'https://pa-api.telldus.com/json/%s' % url
-        # if kwargs.get('local'):
-        #     full_url = 'http://192.168.1.98/api/%s' % url
-        # if 'local' in kwargs:
-        #     del kwargs['local']
-        response = self.__session.get(full_url, params=params)
+        full_url = '%s/%s' % (self.__address, url)
+        response = self._session.get(full_url, params=params)
         if response.ok:
             try:
                 return response.json()
@@ -47,3 +46,21 @@ class TelldusSession():
     @staticmethod
     def pprint(json_data):
         print(json.dumps(json_data, indent=2, sort_keys=True))
+
+class TelldusLiveSession(TelldusSession):
+
+    def __init__(self, config):
+        oauth = OAuth1(
+            config.get_public_key(),
+            client_secret=config.get_private_key(),
+            resource_owner_key=config.get_token(),
+            resource_owner_secret=config.get_token_secret()
+        )
+        super().__init__("https://pa-api.telldus.com/json", oauth)
+
+class TelldusLocalSession(TelldusSession):
+
+    def __init__(self, config):
+        token_auth = TokenAuth(config.get_access_token())
+        address = "%s/api" % config.get_local_address()
+        super().__init__(address, token_auth)

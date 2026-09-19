@@ -19,6 +19,14 @@ class BaseTelldusConfiguration(abc.ABC):
     def get_token_secret(self):
         return None
 
+    @abc.abstractmethod
+    def get_access_token(self):
+        return None
+
+    @abc.abstractmethod
+    def get_local_address(self):
+        return None
+
 class JSONTelldusConfiguraton(BaseTelldusConfiguration):
 
     def __init__(self, json_file):
@@ -36,5 +44,11 @@ class JSONTelldusConfiguraton(BaseTelldusConfiguration):
 
     def get_token_secret(self):
         return self.json_data['token_secret']
+
+    def get_access_token(self):
+        return self.json_data['access_token']
+
+    def get_local_address(self):
+        return self.json_data['local_address']
 
 # TODO create a Oauth 1.0 workflow Configuration class
