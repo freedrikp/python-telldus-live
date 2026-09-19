@@ -32,7 +32,7 @@ class DeviceCliMixin(BaseCliMixin):
         print("Name: %s" % info["name"])
         if "model" in info:
             print("Model: %s" % info["model"])
-        print("State: %s" % self.__state[info["state"]])
+        print("State: %s" % self.__state[int(info["state"])])
         print("-"*50)
 
     def run(self, session, args):
